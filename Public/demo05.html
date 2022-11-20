@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+	<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+	<script type="text/javascript">
+		function getData(sortField, sortOrder) {
+            var sortField = $("#sel").val(),
+                sortOrder = $('input[name="order"]:checked').val();
+            $.get('/users').then(function(res) {
+                if(sortField !== "") {
+                    sortOrder = sortOrder || "asc";
+                    res.sort(function(a, b) {
+                       return  sortOrder === "asc" ? a[sortField] > b[sortField] : a[sortField] < b[sortField];
+                    });
+                }
+                displayData(res);
+            });
+        }
+
+        function displayData(data) {
+            var $tbody = $("#dataTable tbody");
+            $tbody.empty();
+            data.forEach(function (t) {
+                $tbody.append("<tr>" + "<td>" + t.name + "</td>" + "<td>" + t.age + "</td>" + "</tr>");
+            });
+        }
+
+        function sortFunctionAZ(){
+            var table = document.getElementById("dataTable");
+            var switching = true;
+            while(switching){
+                switching = false;
+                var rows = table.getElementsByTagName("tr");
+                for(var i=1; i<(rows.length -1); i++){
+                    switching = false;
+                    var x=rows[i].getElementsByTagName("td")[0];
+                    var y=rows[i+1].getElementsByTagName("td")[0];
+                    if(x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()){
+                        switching=true;
+                        break;
+                    }
+                }
+                if(switching){
+                    rows[i].parentNode.insertBefore(rows[i+1],rows[i]);
+                    switching=true;
+                }
+            }
+        }
+
+        function sortFunctionZA(){
+            var table = document.getElementById("dataTable");
+            var switching = true;
+            while(switching){
+                switching = false;
+                var rows = table.getElementsByTagName("tr");
+                for(var i=1; i<(rows.length -1); i++){
+                    switching = false;
+                    var x=rows[i].getElementsByTagName("td")[0];
+                    var y=rows[i+1].getElementsByTagName("td")[0];
+                    if(x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()){
+                        switching=true;
+                        break;
+                    }
+                }
+                if(switching){
+                    rows[i].parentNode.insertBefore(rows[i+1],rows[i]);
+                    switching=true;
+                }
+            }
+        }
+
+		$(document).ready(function() {
+			getData();
+		})
+	</script>
+	<title>Demo05</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h1>User List</h1>
+    </div>
+    <div class="row">
+        <table class="table" id="dataTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <h2>Sorting</h2>
+        <p>Click，Sort Ascending（A to Z）。</p>
+        <button onclick="sortFunctionAZ()">Sort AZ</button>
+        <p>Click，Sort Descending（Z to A）。</p>
+        <button onclick="sortFunctionZA()">Sort ZA</button>
+
+
+
+        <div class="radio">
+            <label><input type="radio" name="order" value="asc" checked>Ascending</label>
+        </div>
+        <div class="radio">
+            <label><input type="radio" name="order" value="dec">Descending</label>
+        </div>
+        <label for="sel" class="">Sort By </label>
+        <select class="form-control" id="sel">
+            <option></option>
+            <option value="name">Name</option>
+            <option value="age">Age</option>
+        </select>
+    </div>
+    <div class="row">
+        <h2>Add User</h2>
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" id="name" >
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="text" name="age" class="form-control" id="age" >
+            </div>
+            <div>
+                <button id="add" type="button" class="btn btn-primary">Add</button>
+                <button id="clear" type="button" class="btn btn-primary">Clear</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+	<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#btn1").click(function() {
+				$("#first").hide(1000, function() {
+					console.log("first para is hidden");
+					$("#last").hide(500, function() {
+						console.log("second para is hidden");
+					});
+				});
+			});
+			$("#btn2").click(function() {
+				$.when($("#first").show(1000))
+				.then(function() {
+					console.log("first para is displayed");
+					return $.when($("#last").show(500));
+				})
+				.then(function() {
+					console.log("last para is displayed");
+				});
+			});
+			$("#btn3").click(function() {
+				$.when(
+					$("#first").hide(1000),
+					$("#last").hide(500)
+				).then(function() {
+					console.log("Both para are hidden.")
+				});
+			});
+			$("#btn4").on("click", function() {
+				var deferred = $.Deferred();
+				$.when(
+					$("#first").show(1000),
+					$("#last").show(500)
+				).then(function() {
+					deferred.resolve("Both para are displayed.");
+					// deferred.reject
+				});
+				// .fail
+				deferred.done(function(data) {
+					console.log(data);
+				});
+			});
+		})
+
+		$(document).ready(function() {
+			$("#cal1").click(function(event) {
+				event.preventDefault(); // prevent default action which is submiiting the form.
+
+				// $.ajax
+				// $.ajax({
+				// 	url: "/cal/add/" + $("#x").val() + "/" + $("#y").val(),
+				// 	type: "get",
+				// 	success: function(res) {
+				// 		console.log(res);
+				// 	}
+				// });
+
+				var url = "/cal/add/" + $("#x").val() + "/" + $("#y").val();
+				$.get(url).then(function(res) {
+					console.log(res);
+					var r = res;
+					var url2 = "/cal/multiply/" + $("#x").val() + "/" + $("#y").val();
+					$.get(url2).then(function(res) {
+						$("#result").text(r / res);
+					});
+				});
+			});
+			$("#cal2").click(function() {
+				var url = "/cal/add/" + $("#x").val() + "/" + $("#y").val();
+				var url2 = "/cal/multiply/" + $("#x").val() + "/" + $("#y").val();
+				$.when(
+					$.get(url),
+					$.get(url2)
+				).done(function(res1, res2) {
+					console.log(res1, res2);
+					$("#result").text(res1[0] / res2[0]);
+				});
+			});
+
+			$("#cal3").click(function() {
+				var data = {
+					x: $("#x").val(),
+					y: $("#y").val()
+				};
+				var url = "/cal/add";
+				$.post(url, data).then(function(res) {
+					console.log(res);
+					var r = res;
+					var url2 = "/cal/multiply";
+					$.post(url2, data).then(function(res) {
+						$("#result").text(r / res);
+					});
+				});
+			})
+		})
+	</script>
+	<title>Demo04</title>
+</head>
+<body>
+	<div class="container">
+	<h1>JQuery Promise</h1>
+	<hr>
+	<p id="first">This is first paragraph.</p>
+	<p id="last">This is last paragraph.</p>
+	<div>
+		<button id="btn1" class="btn btn-primary">Hide</button>
+		<button id="btn2" class="btn btn-primary">Show</button>
+		<button id="btn3" class="btn btn-primary">Hide Two</button>
+		<button id="btn4" class="btn btn-primary">Show Two</button>
+	</div>
+	<hr>
+	<h2>Jquery Ajax</h2>
+	<form class="col-sm-6">
+		<div class="form-group">
+			<label for="x">Input x</label>
+			<input type="number" name="x" class="form-control" id="x" placeholder="5" min="1" max="100">
+		</div>
+		<div class="form-group">
+			<label for="y">Input y</label>
+			<input type="number" name="y" class="form-control" id="y" placeholder="5" min="1" max="100">
+		</div>
+		<div>
+			<button id="cal1" type="submit" class="btn btn-default">Calculate1</button>
+			<button id="cal2" type="button" class="btn btn-default">Calculate2</button>
+			<button id="cal3" type="button" class="btn btn-default">Calculate3</button>
+		</div>
+		<h3>Result: <span id="result"></span></h3>
+	</form>
+</div>
+</body>
+</html>
